@@ -640,7 +640,7 @@ class Bama_Marzo_Yparraguirre_FinalProj extends JFrame {
             if (line.trim().isEmpty()) {
                 continue;
             }
-            String[] perLexeme = line.split("[\\s\\t]+");
+            String[] perLexeme = line.trim().split("[\\s\\t]+");
             // Split the line into tokens using one or more spaces
             for (String lexeme : perLexeme) {
                 if (isKeyword(lexeme)) { // token,KEYWORD
@@ -712,7 +712,7 @@ class Bama_Marzo_Yparraguirre_FinalProj extends JFrame {
             if (line.trim().isEmpty()) {
                 continue;
             }
-            String[] perLexeme = line.split("\\s+");
+            String[] perLexeme = line.trim().split("[\\s\\t]+");
             for (String lexeme : perLexeme) {
                 if (isKeyword(lexeme)) {
                     tokenizedForm.append(lexeme);
@@ -1367,7 +1367,6 @@ class Bama_Marzo_Yparraguirre_FinalProj extends JFrame {
             }
         }
         for (strData data : strVar) {
-            if (isValidInteger(userInput)) break;
             if (var.equals(data.getVarName())) {
                 data.setVarValue(userInput);
                 return;

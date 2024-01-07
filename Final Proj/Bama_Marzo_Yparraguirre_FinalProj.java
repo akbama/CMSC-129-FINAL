@@ -197,7 +197,7 @@ class Bama_Marzo_Yparraguirre_FinalProj extends JFrame {
 
     public Bama_Marzo_Yparraguirre_FinalProj() {
 
-        setTitle("Syntax Analyzer");
+        setTitle("IOL Editor");
         setSize(800, 400);
         setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
         

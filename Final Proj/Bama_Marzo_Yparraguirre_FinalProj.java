@@ -728,12 +728,11 @@ class Bama_Marzo_Yparraguirre_FinalProj extends JFrame {
                 // Provide a default action or take appropriate steps in case of an exception
             }
         }
-        
+       
         if (lexicalSuccess) console.append("\n" + "No Lexical Errors Found\n");
         showTokenizedCode();
         printToTableOfVariables();
         syntaxAndSemanticAnalysis();
-        
         if (syntaxAndSemanticSuccess) {
             console.append("\n" + "No Syntax and Semantic Errors Found\n");   
         }
@@ -963,13 +962,14 @@ class Bama_Marzo_Yparraguirre_FinalProj extends JFrame {
                         if (Is.getToken().equals("IS")) {
                             Lexeme varValue = lexemes.get(i+2);
                             currentStatements.offer(varValue.getLexeme());
+                            
                             if (isValidInteger(varValue.getLexeme())) {
                                 intV = new intData (type.getLexeme(), Long.parseLong(varValue.getLexeme()));
                                 intVar.add(intV);
                                 i+=2;
                             }
                             else { //error statement
-                                if (varValue.getLexeme().equals("ERR_LEX")) errorType = "NOT A VALID VARIABLE";
+                                if (varValue.getToken().equals("ERR_LEX")) errorType = "NOT A VALID VARIABLE";
                                 else errorType = "NOT A VALID INTEGER VALUE [" + varValue.getLexeme() + "]";
                                 printError(currentLine, errorType);
                                 i+=2;
@@ -984,7 +984,15 @@ class Bama_Marzo_Yparraguirre_FinalProj extends JFrame {
                         }
                     else {
                         errorType = "NOT A VALID VARIABLE";
+                        Is = lexemes.get(i+1);
+                        currentStatements.offer(Is.getToken());
+                        if (Is.getToken().equals("IS")) {
+                            Lexeme varValue = lexemes.get(i+2);
+                            currentStatements.offer(varValue.getLexeme());
+                            i +=2;
+                        }
                         printError(currentLine, errorType);
+                        
                     }
                 }
                 else if (currentToken.equals("STR")) {

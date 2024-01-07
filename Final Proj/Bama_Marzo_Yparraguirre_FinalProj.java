@@ -1065,7 +1065,20 @@ class Bama_Marzo_Yparraguirre_FinalProj extends JFrame {
                 //System.out.println("PosExpr: " + i);
             }
             else if (currentToken.equals("NEWLN")) continue;
-            else if (currentToken.equals("IOL") || currentToken.equals("LOI")) continue;
+            else if (currentToken.equals("IOL")) continue;
+            else if (currentToken.equals("LOI")) {
+                if (i == lexemes.size()-1) break;
+                else {
+                    currentStatements.offer(currentToken);
+                    errorType = "INVALID FORMAT";
+                    printError(currentLine, errorType);
+                }
+            }
+            else if (currentToken.equals("IS")) {
+                currentStatements.offer(currentToken);
+                errorType = "INVALID FORMAT";
+                printError(currentLine, errorType);
+            }
             else {
                 i = checkExpr0(i)-1;
                 emptyStack();

@@ -641,7 +641,7 @@ class Bama_Marzo_Yparraguirre_FinalProj extends JFrame {
     public boolean isIntLIT(String word) {
         try {
             // Attempt to parse the string as an integer
-            Integer.parseInt(word);
+            Long.parseLong(word);
             // If parsing succeeds, it's an integer
             return true;
         } catch (NumberFormatException e) {
@@ -677,30 +677,39 @@ class Bama_Marzo_Yparraguirre_FinalProj extends JFrame {
         console.append("\nExecute lexical analysis: \n");
         for (String line : perLine) {
             // Skip empty lines
-                count++;
-            if (line.trim().isEmpty()) {
-                continue;
-            }
-            String[] perLexeme = line.trim().split("[\\s\\t]+");
-            // Split the line into tokens using one or more spaces
-            for (String lexeme : perLexeme) {
-                if (isKeyword(lexeme)) { // token,KEYWORD
+            count++;
+        
+            try {
+                if (line.trim().isEmpty()) {
+                    continue;
+                }
+        
+                String[] perLexeme = line.trim().split("[\\s\\t]+");
+        
+                // Split the line into tokens using one or more spaces
+                for (String lexeme : perLexeme) {
+                    if (isKeyword(lexeme)) { // token,KEYWORD
                         word = new Lexeme(lexeme, "KEYWORD", count);
                         lexemes.add(word);
-                } else if (isIntLIT(lexeme)) {
+                    } else if (isIntLIT(lexeme)) {
                         word = new Lexeme("INT_LIT", lexeme, count);
                         lexemes.add(word);
-                } else if (isVariableName(lexeme)) {
-                    word = new Lexeme("IDENT", lexeme, count);
-                    lexemes.add(word);
-                } else {
-                    lexicalSuccess = false;
-                    successfulComp = false;
-                    word = new Lexeme("ERR_LEX", "ERR_LEX", count);
-                    tokenizedForm.append("ERR_LEX");
-                    lexemes.add(word);
-                    console.append("Error lexeme at line " + count + " Lexeme: [ " + lexeme + " ]\n");
+                    } else if (isVariableName(lexeme)) {
+                        word = new Lexeme("IDENT", lexeme, count);
+                        lexemes.add(word);
+                    } else {
+                        lexicalSuccess = false;
+                        successfulComp = false;
+                        word = new Lexeme("ERR_LEX", lexeme, count);
+                        tokenizedForm.append("ERR_LEX");
+                        lexemes.add(word);
+                        console.append("Error lexeme at line " + count + " Lexeme: [ " + lexeme + " ]\n");
+                    }
                 }
+            } catch (Exception e) {
+                // Handle the exception (e.g., log it, throw a different exception, etc.)
+                System.err.println("Exception during lexeme processing: " + e.getMessage());
+                // Provide a default action or take appropriate steps in case of an exception
             }
         }
         
@@ -708,6 +717,7 @@ class Bama_Marzo_Yparraguirre_FinalProj extends JFrame {
         showTokenizedCode();
         printToTableOfVariables();
         syntaxAndSemanticAnalysis();
+        
         if (syntaxAndSemanticSuccess) {
             console.append("\n" + "No Syntax and Semantic Errors Found\n");   
         }
@@ -832,10 +842,10 @@ class Bama_Marzo_Yparraguirre_FinalProj extends JFrame {
     // Class representing integer data with variable name and value
     public class intData {
         private String variableName; // Token type (e.g., KEYWORD, INT_LIT, IDENT)
-        private int value; // Lexeme content
+        private long value; // Lexeme content
     
          // Constructor for IntData class
-        public intData(String variableName, int value) {
+        public intData(String variableName, long value) {
             this.variableName = variableName;
             this.value = value;
         }
@@ -846,11 +856,11 @@ class Bama_Marzo_Yparraguirre_FinalProj extends JFrame {
         }
     
         // Getter method for variable value
-        public int getVarValue() {
+        public long getVarValue() {
             return value;
         }
 
-        public void setVarValue(int newValue) {
+        public void setVarValue(long newValue) {
             this.value = newValue;
         }
     }
@@ -918,10 +928,10 @@ class Bama_Marzo_Yparraguirre_FinalProj extends JFrame {
             Lexeme eval = lexemes.get(0), eval2 = lexemes.get(lexemes.size()-1);
             
             String firstToken = eval.getToken();
-            String lastToken = eval2.getToken(); 
+            String lastToken = eval2.getToken();
             if (!firstToken.equals("IOL") || !lastToken.equals("LOI")) {
                 errorExist = true;
-                error = "INVALID CODE";
+                error = "MUST START WITH IOL AND END WITH LOI";
                 break;
             }
             else if (currentToken.equals("INT") || currentToken.equals("STR")) {
@@ -938,7 +948,7 @@ class Bama_Marzo_Yparraguirre_FinalProj extends JFrame {
                             Lexeme varValue = lexemes.get(i+2);
                             currentStatements.offer(varValue.getLexeme());
                             if (isValidInteger(varValue.getLexeme())) {
-                                intV = new intData (type.getLexeme(), Integer.parseInt(varValue.getLexeme()));
+                                intV = new intData (type.getLexeme(), Long.parseLong(varValue.getLexeme()));
                                 intVar.add(intV);
                                 i+=2;
                             }
@@ -974,7 +984,7 @@ class Bama_Marzo_Yparraguirre_FinalProj extends JFrame {
                     }
                     else {
                         if (currentVariable.equals("ERR_LEX")) errorType = "NOT A VALID VARIABLE";
-                        else errorType = "INVALID FORMAT";
+                        else errorType = "2INVALID FORMAT";
                         printError(currentLine, errorType);
                     }
                 }
@@ -994,12 +1004,12 @@ class Bama_Marzo_Yparraguirre_FinalProj extends JFrame {
                         i++;
                         currentStatements.offer(Is.getToken());
                         i = checkExpr0(i) - 1;
-                        System.out.println("Pos: " + i);
+                        //System.out.println("Pos: " + i);
                     }
                 }
                 else {
                     if (intoVar.getToken().equals("ERR_LEX")) errorType = "NOT A VALID VARIABLE [" + intoVar.getLexeme() + "]";
-                    else if (intoVar.getLexeme().equals("KEYWORD")) {i -= 1; errorType = "INVALID FORMAT";}
+                    else if (intoVar.getLexeme().equals("KEYWORD")) {i -= 1; errorType = "3INVALID FORMAT";}
                     else errorType = "UNDECLARED VARIABLE [" + intoVar.getLexeme() +"]";
                     printError(currentLine, errorType);
                 }
@@ -1010,26 +1020,6 @@ class Bama_Marzo_Yparraguirre_FinalProj extends JFrame {
                 currentStatements.offer(currentToken);
                 i++;
                 i = checkExpr0(i)-1;
-                String current = "";
-                Lexeme error = lexemes.get(i+1);
-                current = error.getLexeme();
-                while (!isCommand(error.getToken())){
-                    i++;
-                    error = lexemes.get(i);
-                    errorInEXPR = true;
-                    current = error.getLexeme();
-                    if (error.getLexeme().equals("KEYWORD")) current = error.getToken();
-                    if (isCommand(error.getToken())) {
-                        i -=1;
-                        break;
-                    }
-                    currentStatements.offer(current);
-                }
-                if (errorInEXPR) {
-                    errorType = "INVALID FORMAT";
-                    errorExist = true;
-                    printError(currentLine, errorType);
-                }
             }
             else if (currentToken.equals("BEG")) {
                 currentStatements.offer(currentToken);
@@ -1041,23 +1031,23 @@ class Bama_Marzo_Yparraguirre_FinalProj extends JFrame {
                 else {
                     errorExist = true;
                     if (begVar.getToken().equals("ERR_LEX")) errorType = "NOT A VALID VARIABLE";
-                    else if (begVar.getLexeme().equals("KEYWORD")) {i -= 1; errorType = "INVALID FORMAT";}
+                    else if (begVar.getLexeme().equals("KEYWORD")) {i -= 1; errorType = "5INVALID FORMAT";}
                     else errorType = "UNDECLARED VARIABLE [" + begVar.getLexeme() +"]";
                     printError(currentLine, errorType);
                 }
             }
             else if (isOppr(currentToken)) {
                 i = checkExpr0(i) - 1;
-                System.out.println("PosExpr: " + i);
+                //System.out.println("PosExpr: " + i);
             }
             else if (currentToken.equals("NEWLN")) continue;
             else if (currentToken.equals("IOL") || currentToken.equals("LOI")) continue;
             else {
+                i = checkExpr0(i)-1;
+                emptyStack();
                 if (isKeyword(currentToken)) {
                     currentLexeme = currentToken;
                 }
-                i = checkExpr0(i)-1;
-                emptyStack();
             }
             emptyStack();
         }
@@ -1084,6 +1074,7 @@ class Bama_Marzo_Yparraguirre_FinalProj extends JFrame {
     }
 
     void errorsPartII() {
+        syntaxAndSemanticSuccess = false;
         successfulComp = false;
         console.append("\nErrors Found: \n" + error);
     }
@@ -1099,6 +1090,7 @@ class Bama_Marzo_Yparraguirre_FinalProj extends JFrame {
         activeOppr = false;
         pos = count0;
         Lexeme expr = lexemes.get(pos);
+        System.out.println("DIRI: " + expr.getToken());
         if (isIntLIT(expr.getLexeme())) {
             currentStatements.offer(expr.getLexeme()); 
             return pos+1;}
@@ -1116,13 +1108,19 @@ class Bama_Marzo_Yparraguirre_FinalProj extends JFrame {
                 errorType = "TYPE INCOMPABILITY";
                 printError(currentLine, errorType);
             }
-            System.out.println("POS:" + pos + ">>>>>" + expr.getLexeme());
+            //System.out.println("POS:" + pos + ">>>>>" + expr.getLexeme());
             currentStatements.offer(expr.getLexeme()); 
             return pos+1;
         }
         else if (isOppr(expr.getToken())) {
             activeOppr = true;
             numExpr();
+        }
+        else if (expr.getToken().equals("ERR_LEX")){
+            currentStatements.offer(expr.getLexeme()); 
+            errorType = "INVALID FORMAT";
+            printError(currentLine, errorType);
+            return pos+1;
         }
         return pos;
     }
@@ -1165,7 +1163,9 @@ class Bama_Marzo_Yparraguirre_FinalProj extends JFrame {
             numExpr();
         }
         else {
-            printError(currentLine, "INVALID FORMAT");
+            currentStatements.offer(expr1.getToken());
+            printError(currentLine, "1INVALID FORMAT");
+            pos++;
         }
         if (err) {
             printError(currentLine, errorType);
@@ -1211,7 +1211,7 @@ class Bama_Marzo_Yparraguirre_FinalProj extends JFrame {
     // Helper method to check if a string represents a valid integer
     private boolean isValidInteger(String str) {
         try {
-            Integer.parseInt(str);
+            Long.parseLong(str);
             return true;
         } catch (NumberFormatException e) {
             return false;
@@ -1236,6 +1236,7 @@ class Bama_Marzo_Yparraguirre_FinalProj extends JFrame {
                 variableSearchAndReplace(var, userInput);
                 if (typeError) {
                     console.append("\nType Mismatch\n");
+                    console.append("\nProgram will now be terminated...\n");
                     return;
                 }
                 console.append("Input for " + var + ": " + userInput + "\n");
@@ -1275,8 +1276,8 @@ class Bama_Marzo_Yparraguirre_FinalProj extends JFrame {
 
     public static int posCount;
     public String exprRes = "";
-    public int firstExpr = 0;
-    public int secondExpr = 0;
+    public long firstExpr = 0;
+    public long secondExpr = 0;
 
     public Object[] exprEval(int count, String var) {
         firstExpr = 0; 
@@ -1285,27 +1286,27 @@ class Bama_Marzo_Yparraguirre_FinalProj extends JFrame {
         Lexeme expr = lexemes.get(posCount);
         if (isIntLIT(expr.getLexeme()) || expr.getToken().equals("IDENT")) {
             exprRes = expr.getLexeme();
-            System.out.println("Pos: " + posCount);
-            System.out.println("Expr: " + exprRes);
+            //System.out.println("Pos: " + posCount);
+            //System.out.println("Expr: " + exprRes);
             return new Object[]{posCount++, exprRes};
         }
         else if (isOppr(expr.getToken())) {
-            System.out.println("Pos: " + posCount);
-            System.out.println("Expr: " + expr.getToken());
+            //System.out.println("Pos: " + posCount);
+            //System.out.println("Expr: " + expr.getToken());
            numExprEval();
         }
         return new Object[]{posCount, exprRes};
     }
     
-    public int numExprEval () {
+    public long numExprEval () {
         String opp = "";
-        int results = 0;
+        long results = 0;
         Lexeme expr1 = lexemes.get(posCount);
         System.out.println(expr1);
         if (isIntLIT(expr1.getLexeme())) {
             System.out.println("Ye");
             posCount++; 
-            return Integer.parseInt(expr1.getLexeme());
+            return Long.parseLong(expr1.getLexeme());
         }
         else if (isOppr(expr1.getToken())) {
             System.out.println("Ya");
@@ -1315,23 +1316,26 @@ class Bama_Marzo_Yparraguirre_FinalProj extends JFrame {
             secondExpr = exprEval1();
 
             results = eqSolve(opp, firstExpr, secondExpr);
+            System.out.println("Ngano ka? " + results);
             exprRes = String.valueOf(results);
+            System.out.println("Ngano ka? " + results);
             return results;
         }
+        System.out.println("Ngano ka? " + results);
         return results;
     }
 
     // Method for processing general expressions
-    public int exprEval1() {
+    public long exprEval1() {
         Lexeme expr1 = lexemes.get(posCount);
         if (isIntLIT(expr1.getLexeme())) { // NAGCHANGE KO DIRI
             System.out.println("Expr: " + expr1.getLexeme());
             posCount++;
-            return Integer.parseInt(expr1.getLexeme());
+            return Long.parseLong(expr1.getLexeme());
         } else if(expr1.getToken().equals("IDENT")){
             posCount++;
-            System.out.println("huy" + resultVar(expr1.getLexeme()));
-            return Integer.parseInt(resultVar(expr1.getLexeme()));
+            //System.out.println("huy" + resultVar(expr1.getLexeme()));
+            return Long.parseLong(resultVar(expr1.getLexeme()));
         }
         else if (isOppr(expr1.getToken())) {
             return numExprEval2();
@@ -1339,17 +1343,17 @@ class Bama_Marzo_Yparraguirre_FinalProj extends JFrame {
         return 0;
     }
 
-    public int numExprEval2 () {
+    public long numExprEval2 () {
         String opp = "";
-        int a, b;
+        long a, b;
         Lexeme expr1 = lexemes.get(posCount);
         if (isIntLIT(expr1.getLexeme())) {
-            System.out.println("Ye1");
+            //System.out.println("Ye1");
             posCount++; 
-            return Integer.parseInt(expr1.getLexeme());
+            return Long.parseLong(expr1.getLexeme());
         }
         else if (isOppr(expr1.getToken())) {
-            System.out.println("Ya1");
+            //System.out.println("Ya1");
             opp = expr1.getToken();
             posCount++;
             a = exprEval1();
@@ -1359,8 +1363,8 @@ class Bama_Marzo_Yparraguirre_FinalProj extends JFrame {
         return 0;
     }
 
-    public int eqSolve(String opp, int a, int b) {
-        int results = 0;
+    public long eqSolve(String opp, long a, long b) {
+        long results = 0;
     
         try {
             switch (opp) {
@@ -1393,7 +1397,7 @@ class Bama_Marzo_Yparraguirre_FinalProj extends JFrame {
         } catch (ArithmeticException e) {
             console.append("Arithmetic Exception: " + e.getMessage());
         }
-        System.out.println("Results: " + results);
+        System.out.println("Results: >>>>>>> " + results);
         return results;
     }
     
@@ -1403,7 +1407,7 @@ class Bama_Marzo_Yparraguirre_FinalProj extends JFrame {
         for (intData data : intVar) {
             if (!isValidInteger(userInput)) break;
             if (var.equals(data.getVarName())) {
-                data.setVarValue(Integer.parseInt(userInput));
+                data.setVarValue(Long.parseLong(userInput));
                 return;
             }
         }

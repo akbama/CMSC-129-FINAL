@@ -23,6 +23,8 @@ import java.awt.Rectangle;
 import java.awt.Shape;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
+import java.awt.event.InputEvent;
+import java.awt.event.KeyEvent;
 import java.awt.event.MouseEvent;
 import java.awt.event.MouseListener;
 import java.awt.event.MouseMotionListener;
@@ -39,7 +41,9 @@ import java.util.List;
 import java.util.Queue;
 import java.util.Set;
 
+import javax.swing.AbstractAction;
 import javax.swing.JButton;
+import javax.swing.JComponent;
 import javax.swing.JDialog;
 import javax.swing.JFileChooser;
 import javax.swing.JFrame;
@@ -54,6 +58,7 @@ import javax.swing.JSplitPane;
 import javax.swing.JTable;
 import javax.swing.JTextArea;
 import javax.swing.JTextPane;
+import javax.swing.KeyStroke;
 import javax.swing.ListSelectionModel;
 import javax.swing.SwingUtilities;
 import javax.swing.event.CaretEvent;
@@ -337,19 +342,30 @@ class Bama_Marzo_Yparraguirre_FinalProj extends JFrame {
     compileCode.addMenuListener(new MenuListener() {
         @Override
         public void menuSelected(MenuEvent e) {
-            if (currentFile == null)  {
-                saveAsMethod();
+            if (currentFile == null) {
+                int option = JOptionPane.showConfirmDialog(
+                        Bama_Marzo_Yparraguirre_FinalProj.this,
+                        "Save changes before compiling?",
+                        "Save",
+                        JOptionPane.YES_NO_CANCEL_OPTION);
+    
+                if (option == JOptionPane.YES_OPTION) {
+                    saveMethod();
+                } else if (option == JOptionPane.CANCEL_OPTION || option == JOptionPane.CLOSED_OPTION) {
+                    return;  // Cancel compilation if user cancels the save dialog
+                } else {
+                    // If the user selects "No" or closes the dialog, proceed without saving
+                }
             }
-            if (currentFile != null) {
-                compileCode();
-            }
+    
+            compileCode();
         }
-
+    
         @Override
         public void menuDeselected(MenuEvent e) {
             // This method is called when the menu is deselected
         }
-
+    
         @Override
         public void menuCanceled(MenuEvent e) {
             // This method is called when the menu is canceled
@@ -390,8 +406,33 @@ class Bama_Marzo_Yparraguirre_FinalProj extends JFrame {
                 // This method is called when the menu is canceled
             }
         });
-    }
 
+        addShortcutKey(compileCode, KeyEvent.VK_1, InputEvent.CTRL_DOWN_MASK);
+        addShortcutKey(showTokenizedCode, KeyEvent.VK_2, InputEvent.CTRL_DOWN_MASK);
+        addShortcutKey(executeCode, KeyEvent.VK_3, InputEvent.CTRL_DOWN_MASK);
+    }
+    private void addShortcutKey(JMenu menu, int keyCode, int modifiers) {
+        KeyStroke keyStroke = KeyStroke.getKeyStroke(keyCode, modifiers);
+
+        // Create an AbstractAction for the corresponding menu item action
+        AbstractAction action = new AbstractAction() {
+            @Override
+            public void actionPerformed(ActionEvent e) {
+                // Perform the corresponding action based on the menu item
+                if (menu == compileCode) {
+                    compileCode();
+                } else if (menu == showTokenizedCode) {
+                    showTokenizedCode();
+                } else if (menu == executeCode) {
+                    executeProgram();
+                }
+            }
+        };
+
+        // Map the KeyStroke to the AbstractAction in the JFrame's input map
+        getRootPane().getInputMap(JComponent.WHEN_IN_FOCUSED_WINDOW).put(keyStroke, menu.getText());
+        getRootPane().getActionMap().put(menu.getText(), action);
+    }
     // Method for opening file with a file chooser window
     private void openFileMethod(){
         JFileChooser fc = new JFileChooser();
@@ -712,7 +753,7 @@ class Bama_Marzo_Yparraguirre_FinalProj extends JFrame {
             if (line.trim().isEmpty()) {
                 continue;
             }
-            String[] perLexeme = line.trim().split("[\\s\\t]+");
+            String[] perLexeme = line.trim().split("\\s+");
             for (String lexeme : perLexeme) {
                 if (isKeyword(lexeme)) {
                     tokenizedForm.append(lexeme);
@@ -1367,6 +1408,7 @@ class Bama_Marzo_Yparraguirre_FinalProj extends JFrame {
             }
         }
         for (strData data : strVar) {
+            if (isValidInteger(userInput)) break;
             if (var.equals(data.getVarName())) {
                 data.setVarValue(userInput);
                 return;

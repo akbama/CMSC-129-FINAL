@@ -1,0 +1,45 @@
+import javax.swing.*;
+import java.awt.event.ActionEvent;
+import java.awt.event.ActionListener;
+import java.awt.event.KeyEvent;
+import java.awt.event.KeyAdapter;
+
+public class ShortcutExample {
+    public static void main(String[] args) {
+        JFrame frame = new JFrame("Shortcut Example");
+        JButton button = new JButton("Click me!");
+
+        // Add ActionListener to the button
+        button.addActionListener(new ActionListener() {
+            @Override
+            public void actionPerformed(ActionEvent e) {
+                // Your function logic goes here
+                System.out.println("Button clicked!");
+            }
+        });
+
+        // Add KeyAdapter to the frame
+        frame.addKeyListener(new KeyAdapter() {
+            @Override
+            public void keyPressed(KeyEvent e) {
+                // Check for the shortcut key (Ctrl + C in this example)
+                if (e.isControlDown() && e.getKeyCode() == KeyEvent.VK_C) {
+                    // Trigger the button's action
+                    button.doClick();
+                }
+            }
+        });
+
+        // Set default button (Enter key will trigger it)
+        frame.getRootPane().setDefaultButton(button);
+
+        frame.getContentPane().add(button);
+        frame.setSize(300, 200);
+        frame.setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
+        frame.setVisible(true);
+
+        // Make sure the frame is focused to receive key events
+        frame.setFocusable(true);
+        frame.requestFocus();
+    }
+}

@@ -980,7 +980,7 @@ class Bama_Marzo_Yparraguirre_FinalProj extends JFrame {
                             intVar.add(intV);
                         }
 			            int a = varDataCount(type.getLexeme());
-                            if (a!=1) printError(currentLine, "VARIABLE REDECLARATION");
+                            if (a>1) printError(currentLine, "VARIABLE REDECLARATION");
                         }
                     else {
                         errorType = "NOT A VALID VARIABLE";
@@ -1004,7 +1004,7 @@ class Bama_Marzo_Yparraguirre_FinalProj extends JFrame {
                         strV = new strData (type.getLexeme(), "");
                         strVar.add(strV);
 			        int a = varDataCount(type.getLexeme());
-                        if (a!=1) printError(currentLine, "VARIABLE REDECLARATION");
+                        if (a>1) printError(currentLine, "VARIABLE REDECLARATION");
                     }
                     else {
                         if (currentVariable.equals("ERR_LEX")) errorType = "NOT A VALID VARIABLE";

@@ -201,9 +201,9 @@ class Bama_Marzo_Yparraguirre_FinalProj extends JFrame {
         // Menu and Menu Items
         mb = new JMenuBar();
         file = new JMenu("File");
-        compileCode = new JMenu("Compile Code");
-        showTokenizedCode = new JMenu("Show Tokenized Code");
-        executeCode = new JMenu("Execute Code");
+        compileCode = new JMenu("Compile Code (Ctrl + R)");
+        showTokenizedCode = new JMenu("Show Tokenized Code (Ctrl + T)");
+        executeCode = new JMenu("Execute Code (Ctrl + E)");
         save = new JMenuItem("Save");
         saveAs = new JMenuItem("Save As");
         newFile = new JMenuItem("New File");
@@ -407,9 +407,9 @@ class Bama_Marzo_Yparraguirre_FinalProj extends JFrame {
             }
         });
 
-        addShortcutKey(compileCode, KeyEvent.VK_1, InputEvent.CTRL_DOWN_MASK);
-        addShortcutKey(showTokenizedCode, KeyEvent.VK_2, InputEvent.CTRL_DOWN_MASK);
-        addShortcutKey(executeCode, KeyEvent.VK_3, InputEvent.CTRL_DOWN_MASK);
+        addShortcutKey(compileCode, KeyEvent.VK_R, InputEvent.CTRL_DOWN_MASK);
+        addShortcutKey(showTokenizedCode, KeyEvent.VK_T, InputEvent.CTRL_DOWN_MASK);
+        addShortcutKey(executeCode, KeyEvent.VK_E, InputEvent.CTRL_DOWN_MASK);
     }
     private void addShortcutKey(JMenu menu, int keyCode, int modifiers) {
         KeyStroke keyStroke = KeyStroke.getKeyStroke(keyCode, modifiers);
@@ -424,7 +424,8 @@ class Bama_Marzo_Yparraguirre_FinalProj extends JFrame {
                 } else if (menu == showTokenizedCode) {
                     showTokenizedCode();
                 } else if (menu == executeCode) {
-                    executeProgram();
+                    if (executeCode.isEnabled())
+                        executeProgram();
                 }
             }
         };
@@ -435,6 +436,7 @@ class Bama_Marzo_Yparraguirre_FinalProj extends JFrame {
     }
     // Method for opening file with a file chooser window
     private void openFileMethod(){
+        
         JFileChooser fc = new JFileChooser();
         
         // Create a file filter to only allow .iol files
@@ -456,6 +458,10 @@ class Bama_Marzo_Yparraguirre_FinalProj extends JFrame {
             if (file.exists()) {
                 try {
                     if (file.getName().endsWith(".iol")) {
+                        codeEditor.setText("");
+                        tokenizedCodeArea.setText("");
+                        tableModel.setRowCount(0);
+                        console.setText("");
                         // Read the content of the selected file
                         BufferedReader reader = new BufferedReader(new FileReader(file));
                         StringBuilder content = new StringBuilder();
@@ -725,7 +731,6 @@ class Bama_Marzo_Yparraguirre_FinalProj extends JFrame {
         if (lexicalSuccess && syntaxAndSemanticSuccess) {
             console.append("\n" + currentFile.getName() + " compiled with no errors found");
             executeCode.setEnabled(true);
-            //executeProgram();
         }
     }
     
@@ -1220,7 +1225,7 @@ class Bama_Marzo_Yparraguirre_FinalProj extends JFrame {
 
 
     public void executeProgram() {
-        console.append("\nIOL Execution\n");
+        console.append("\n\nIOL Execution\n");
         for (int i = 0; i < lexemes.size(); i++) {
             typeError = false;
             String var = "";

@@ -197,11 +197,7 @@ class Bama_Marzo_Yparraguirre_FinalProj extends JFrame {
 
     public Bama_Marzo_Yparraguirre_FinalProj() {
 
-<<<<<<< Updated upstream
         setTitle("IOL Editor");
-=======
-        setTitle("IOL ++");
->>>>>>> Stashed changes
         setSize(800, 400);
         setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
         
@@ -1395,12 +1391,7 @@ class Bama_Marzo_Yparraguirre_FinalProj extends JFrame {
         }
         return 0;
     }
-<<<<<<< Updated upstream
-
-    // Method to solve equations
-=======
     boolean mathErr = false;
->>>>>>> Stashed changes
     public long eqSolve(String opp, long a, long b) {
         long results = 0;
     

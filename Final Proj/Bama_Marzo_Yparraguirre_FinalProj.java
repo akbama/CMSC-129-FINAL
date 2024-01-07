@@ -39,6 +39,8 @@ import java.util.List;
 import java.util.Queue;
 import java.util.Set;
 
+import javax.swing.JButton;
+import javax.swing.JDialog;
 import javax.swing.JFileChooser;
 import javax.swing.JFrame;
 import javax.swing.JLabel;
@@ -209,7 +211,8 @@ class Bama_Marzo_Yparraguirre_FinalProj extends JFrame {
         mb.add(file);
         mb.add(compileCode);
         mb.add(showTokenizedCode);
-        //mb.add(executeCode); // this line of code doesn't have any used in the current version of the program
+        mb.add(executeCode); // this line of code doesn't have any used in the current version of the program
+        executeCode.setEnabled(false);
 
         // Code Editor and Tokenized Code Area
         codeEditor = new JTextPane();
@@ -278,16 +281,19 @@ class Bama_Marzo_Yparraguirre_FinalProj extends JFrame {
         codeEditor.getDocument().addDocumentListener(new DocumentListener() {
         @Override
         public void insertUpdate(DocumentEvent e) {
+            executeCode.setEnabled(false);
             updateLineNumbers();
         }
 
         @Override
         public void removeUpdate(DocumentEvent e) {
+            executeCode.setEnabled(false);
             updateLineNumbers();
         }
 
         @Override
         public void changedUpdate(DocumentEvent e) {
+            executeCode.setEnabled(false);
             updateLineNumbers();
         }
     });
@@ -296,6 +302,7 @@ class Bama_Marzo_Yparraguirre_FinalProj extends JFrame {
     openFile.addActionListener(new ActionListener() {
         @Override
         public void actionPerformed(ActionEvent e) {
+            executeCode.setEnabled(false);
             openFileMethod();
         }
     });
@@ -304,6 +311,7 @@ class Bama_Marzo_Yparraguirre_FinalProj extends JFrame {
     newFile.addActionListener(new ActionListener() {
         @Override
         public void actionPerformed(ActionEvent e) {
+            executeCode.setEnabled(false);
             newFileMethod();
             saveAsMethod();
         }
@@ -353,6 +361,23 @@ class Bama_Marzo_Yparraguirre_FinalProj extends JFrame {
             @Override
             public void menuSelected(MenuEvent e) {
                 showTokenizedCode();
+            }
+
+            @Override
+            public void menuDeselected(MenuEvent e) {
+                // This method is called when the menu is deselected
+            }
+
+            @Override
+            public void menuCanceled(MenuEvent e) {
+                // This method is called when the menu is canceled
+            }
+        });
+
+        executeCode.addMenuListener(new MenuListener() {
+            @Override
+            public void menuSelected(MenuEvent e) {
+                executeProgram();
             }
 
             @Override
@@ -648,28 +673,39 @@ class Bama_Marzo_Yparraguirre_FinalProj extends JFrame {
 
         if (lexicalSuccess && syntaxAndSemanticSuccess) {
             console.append("\n" + currentFile.getName() + " compiled with no errors found");
-            executeProgram();
+            executeCode.setEnabled(true);
+            //executeProgram();
         }
     }
     
     // Method to display tokenized code in the TokenizedCodeArea
     private void showTokenizedCode() {
         saveMethod();
-        JFrame tkFrame = new JFrame("Tokenized Code");
+    
+        JDialog tkDialog = new JDialog();
+        tkDialog.setTitle("Tokenized Code");
+        tkDialog.setLayout(new BorderLayout());
+    
         JTextArea tokenizedCodeArea = new JTextArea();
-        JScrollPane tkScrollPane = new JScrollPane(tokenizedCodeArea);
-
-        tkFrame.setSize(400, 300);
-        tkFrame.setDefaultCloseOperation(JFrame.DISPOSE_ON_CLOSE);
-        tkFrame.setLocationRelativeTo(null);
-        tkFrame.setVisible(true);
-
         tokenizedCodeArea.setEditable(false);
-
-        tkFrame.add(tkScrollPane);
-
+    
+        JScrollPane tkScrollPane = new JScrollPane(tokenizedCodeArea);
+    
+        JButton closeButton = new JButton("Close");
+        closeButton.addActionListener(e -> tkDialog.dispose());
+    
+        tkDialog.add(tkScrollPane, BorderLayout.CENTER);
+        tkDialog.add(closeButton, BorderLayout.SOUTH);
+    
+        tkDialog.setSize(400, 300);
+        tkDialog.setDefaultCloseOperation(JDialog.DISPOSE_ON_CLOSE);
+        tkDialog.setLocationRelativeTo(null);
+        tkDialog.setModal(true);
+    
+        // Tokenize the code before setting the text area content
         String codeEditorContent = codeEditor.getText();
-        StringBuilder tokenizedForm = new StringBuilder(); // Initialize as a StringBuilder
+        StringBuilder tokenizedForm = new StringBuilder();
+    
         // Split the content into lines
         String[] perLine = codeEditorContent.split("\n");
         for (String line : perLine) {
@@ -678,7 +714,6 @@ class Bama_Marzo_Yparraguirre_FinalProj extends JFrame {
             }
             String[] perLexeme = line.split("\\s+");
             for (String lexeme : perLexeme) {
-                
                 if (isKeyword(lexeme)) {
                     tokenizedForm.append(lexeme);
                 } else if (isIntLIT(lexeme)) {
@@ -692,9 +727,16 @@ class Bama_Marzo_Yparraguirre_FinalProj extends JFrame {
             }
             tokenizedForm.append("\n"); // Add a newline character after each line
         }
-        tokenizedCodeArea.append(tokenizedForm.toString());
+    
+        // Set the generated tokenized code to the tokenizedCodeArea before making the dialog visible
+        tokenizedCodeArea.setText(tokenizedForm.toString());
         saveTokenizedCodeToTknFile(tokenizedForm);
+    
+        // Make the dialog visible after setting the text
+        tkDialog.setVisible(true);
     }
+    
+    
 
     // Display output in the table of variables
     public void printToTableOfVariables() {
@@ -812,6 +854,7 @@ class Bama_Marzo_Yparraguirre_FinalProj extends JFrame {
     boolean errorExist = false;
     boolean errorInEXPR = false;
     boolean successfulComp = true;
+
     // Method for syntax analysis of the code
     private void syntaxAndSemanticAnalysis() {
         errorExist = false;
@@ -869,7 +912,9 @@ class Bama_Marzo_Yparraguirre_FinalProj extends JFrame {
                             intV = new intData (type.getLexeme(), 0);
                             intVar.add(intV);
                         }
-                    }
+			            int a = varDataCount(type.getLexeme());
+                            if (a!=1) printError(currentLine, "VARIABLE REDECLARATION");
+                        }
                     else {
                         errorType = "NOT A VALID VARIABLE";
                         printError(currentLine, errorType);
@@ -883,6 +928,8 @@ class Bama_Marzo_Yparraguirre_FinalProj extends JFrame {
                     if (currentVariable.equals("IDENT")) {
                         strV = new strData (type.getLexeme(), "");
                         strVar.add(strV);
+			        int a = varDataCount(type.getLexeme());
+                        if (a!=1) printError(currentLine, "VARIABLE REDECLARATION");
                     }
                     else {
                         if (currentVariable.equals("ERR_LEX")) errorType = "NOT A VALID VARIABLE";
@@ -968,11 +1015,8 @@ class Bama_Marzo_Yparraguirre_FinalProj extends JFrame {
                 if (isKeyword(currentToken)) {
                     currentLexeme = currentToken;
                 }
-                else {
-                    currentStatements.offer(currentLexeme);
-                    errorType = "INVALID FORMAT";
-                    printError(currentLine, errorType);
-                }
+                i = checkExpr0(i)-1;
+                emptyStack();
             }
             emptyStack();
         }
@@ -1006,6 +1050,7 @@ class Bama_Marzo_Yparraguirre_FinalProj extends JFrame {
     public int pos;
     boolean activeOppr = false;
     boolean into = false;
+
     // Method to check expressions at level 0
 
     public int checkExpr0 (int count0) {
@@ -1030,6 +1075,7 @@ class Bama_Marzo_Yparraguirre_FinalProj extends JFrame {
                 errorType = "TYPE INCOMPABILITY";
                 printError(currentLine, errorType);
             }
+            System.out.println("POS:" + pos + ">>>>>" + expr.getLexeme());
             currentStatements.offer(expr.getLexeme()); 
             return pos+1;
         }
@@ -1096,6 +1142,17 @@ class Bama_Marzo_Yparraguirre_FinalProj extends JFrame {
         return false;
     }
     
+    public int varDataCount (String var) {
+        int dataCount = 0;
+        for (intData data : intVar) {
+            if (var.equals(data.getVarName())) dataCount ++;
+        }
+        for (strData data : strVar) {
+            if (var.equals(data.getVarName())) dataCount ++;
+        }
+        return dataCount;
+    }
+
     public boolean searchIntData (String var) {
         for (intData data : intVar) {
             if (var.equals(data.getVarName())) return true;
@@ -1126,6 +1183,7 @@ class Bama_Marzo_Yparraguirre_FinalProj extends JFrame {
         for (int i = 0; i < lexemes.size(); i++) {
             typeError = false;
             String var = "";
+            String tok = "";
             //COMMANDS : BEG, INTO, NEWLN, PRINT, 
             Lexeme lexeme = lexemes.get(i);
             currentToken = lexeme.getToken();
@@ -1150,9 +1208,30 @@ class Bama_Marzo_Yparraguirre_FinalProj extends JFrame {
                 System.out.println("Current: " + i);
                 variableSearchAndReplace(var, resultVar((String)result[1]));
             }
+            else if(currentToken.equals("PRINT")) {
+                i++;
+                var = lexemes.get(i).getLexeme(); //get var name
+                if(var.equals("KEYWORD")) {
+                    tok = lexemes.get(i).getToken();
+                    if(tok.equals("ADD" )|| tok.equals("SUB") || tok.equals("MULT") || tok.equals("DIV") || tok.equals("MOD")){
+                  System.out.println("print");
+                        Object[] result = exprEval(i, lexemes.get(i).getLexeme());
+                        console.append(resultVar((String)result[1]));
+                    }
+                    }else{
+                console.append(resultVar(var));
+            }
+            }
+            else if (currentToken.equals("NEWLN")) {
+                console.append("\n");
+            }
+            else if (currentToken.equals("LOI")) {
+                console.append("\n\nProgram terminated successfully...");
+            }
         }
         printIntAndStrData();
     }
+
     public static int posCount;
     public String exprRes = "";
     public int firstExpr = 0;
@@ -1165,9 +1244,13 @@ class Bama_Marzo_Yparraguirre_FinalProj extends JFrame {
         Lexeme expr = lexemes.get(posCount);
         if (isIntLIT(expr.getLexeme()) || expr.getToken().equals("IDENT")) {
             exprRes = expr.getLexeme();
+            System.out.println("Pos: " + posCount);
+            System.out.println("Expr: " + exprRes);
             return new Object[]{posCount++, exprRes};
         }
         else if (isOppr(expr.getToken())) {
+            System.out.println("Pos: " + posCount);
+            System.out.println("Expr: " + expr.getToken());
            numExprEval();
         }
         return new Object[]{posCount, exprRes};
@@ -1177,11 +1260,14 @@ class Bama_Marzo_Yparraguirre_FinalProj extends JFrame {
         String opp = "";
         int results = 0;
         Lexeme expr1 = lexemes.get(posCount);
+        System.out.println(expr1);
         if (isIntLIT(expr1.getLexeme())) {
+            System.out.println("Ye");
             posCount++; 
             return Integer.parseInt(expr1.getLexeme());
         }
         else if (isOppr(expr1.getToken())) {
+            System.out.println("Ya");
             opp = expr1.getToken();
             posCount++;
             firstExpr = exprEval1();
@@ -1197,9 +1283,14 @@ class Bama_Marzo_Yparraguirre_FinalProj extends JFrame {
     // Method for processing general expressions
     public int exprEval1() {
         Lexeme expr1 = lexemes.get(posCount);
-        if (isIntLIT(expr1.getLexeme()) || expr1.getToken().equals("IDENT")) {
+        if (isIntLIT(expr1.getLexeme())) { // NAGCHANGE KO DIRI
+            System.out.println("Expr: " + expr1.getLexeme());
             posCount++;
             return Integer.parseInt(expr1.getLexeme());
+        } else if(expr1.getToken().equals("IDENT")){
+            posCount++;
+            System.out.println("huy" + resultVar(expr1.getLexeme()));
+            return Integer.parseInt(resultVar(expr1.getLexeme()));
         }
         else if (isOppr(expr1.getToken())) {
             return numExprEval2();
@@ -1212,10 +1303,12 @@ class Bama_Marzo_Yparraguirre_FinalProj extends JFrame {
         int a, b;
         Lexeme expr1 = lexemes.get(posCount);
         if (isIntLIT(expr1.getLexeme())) {
+            System.out.println("Ye1");
             posCount++; 
             return Integer.parseInt(expr1.getLexeme());
         }
         else if (isOppr(expr1.getToken())) {
+            System.out.println("Ya1");
             opp = expr1.getToken();
             posCount++;
             a = exprEval1();
@@ -1259,6 +1352,7 @@ class Bama_Marzo_Yparraguirre_FinalProj extends JFrame {
         } catch (ArithmeticException e) {
             console.append("Arithmetic Exception: " + e.getMessage());
         }
+        System.out.println("Results: " + results);
         return results;
     }
     

@@ -1417,7 +1417,6 @@ class Bama_Marzo_Yparraguirre_FinalProj extends JFrame {
             }
         }
         for (strData data : strVar) {
-            if (isValidInteger(userInput)) break;
             if (var.equals(data.getVarName())) {
                 data.setVarValue(userInput);
                 return;

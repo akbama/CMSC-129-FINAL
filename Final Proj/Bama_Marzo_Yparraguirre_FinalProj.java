@@ -197,7 +197,11 @@ class Bama_Marzo_Yparraguirre_FinalProj extends JFrame {
 
     public Bama_Marzo_Yparraguirre_FinalProj() {
 
+<<<<<<< Updated upstream
         setTitle("IOL Editor");
+=======
+        setTitle("IOL ++");
+>>>>>>> Stashed changes
         setSize(800, 400);
         setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
         
@@ -1243,6 +1247,7 @@ class Bama_Marzo_Yparraguirre_FinalProj extends JFrame {
         console.append("\n\nIOL Execution\n\n");
         for (int i = 0; i < lexemes.size(); i++) {
             typeError = false;
+            mathErr = false;
             String var = "";
             String tok = "";
             //COMMANDS : BEG, INTO, NEWLN, PRINT, 
@@ -1278,7 +1283,7 @@ class Bama_Marzo_Yparraguirre_FinalProj extends JFrame {
                     if(tok.equals("ADD" )|| tok.equals("SUB") || tok.equals("MULT") || tok.equals("DIV") || tok.equals("MOD")){
                   //System.out.println("print");
                         Object[] result = exprEval(i, lexemes.get(i).getLexeme());
-                        console.append(resultVar((String)result[1]));
+                        if (!mathErr) console.append(resultVar((String)result[1]));
                     }
                     }else{
                 console.append(resultVar(var));
@@ -1289,6 +1294,13 @@ class Bama_Marzo_Yparraguirre_FinalProj extends JFrame {
             }
             else if (currentToken.equals("LOI")) {
                 console.append("\n\nProgram terminated successfully...");
+            }
+            else {
+                Object[] result = exprEval(i, lexemes.get(i).getLexeme());
+            }
+            if (mathErr) {
+                console.append("\nProgram will now be terminated...\n");
+                return;
             }
         }
         printIntAndStrData();
@@ -1383,8 +1395,12 @@ class Bama_Marzo_Yparraguirre_FinalProj extends JFrame {
         }
         return 0;
     }
+<<<<<<< Updated upstream
 
     // Method to solve equations
+=======
+    boolean mathErr = false;
+>>>>>>> Stashed changes
     public long eqSolve(String opp, long a, long b) {
         long results = 0;
     
@@ -1405,6 +1421,7 @@ class Bama_Marzo_Yparraguirre_FinalProj extends JFrame {
                         results = a / b;
                     } else {
                         console.append("Error: Division by zero");
+                        mathErr = true;
                     }
                     break;
                 case "MOD":
@@ -1413,11 +1430,12 @@ class Bama_Marzo_Yparraguirre_FinalProj extends JFrame {
                         results = a % b;
                     } else {
                         console.append("Error: Division by zero");
+                        mathErr = true;
                     }
                     break;
             }
         } catch (ArithmeticException e) {
-            console.append("Arithmetic Exception: " + e.getMessage());
+            //console.append("Arithmetic Exception: " + e.getMessage());
         }
         //System.out.println("Results: >>>>>>> " + results);
         return results;

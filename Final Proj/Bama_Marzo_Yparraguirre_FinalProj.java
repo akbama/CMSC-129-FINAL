@@ -1240,7 +1240,7 @@ class Bama_Marzo_Yparraguirre_FinalProj extends JFrame {
 
     // Method to execute the program
     public void executeProgram() {
-        console.append("\n\nIOL Execution\n");
+        console.append("\n\nIOL Execution\n\n");
         for (int i = 0; i < lexemes.size(); i++) {
             typeError = false;
             String var = "";
@@ -1436,7 +1436,6 @@ class Bama_Marzo_Yparraguirre_FinalProj extends JFrame {
             }
         }
         for (strData data : strVar) {
-            if (isValidInteger(userInput)) break;
             if (var.equals(data.getVarName())) {
                 data.setVarValue(userInput);
                 return;

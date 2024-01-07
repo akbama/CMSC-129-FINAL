@@ -5,11 +5,14 @@ Alyanna Krista Bama       - 2020-09745
 Julienne Elyze Marzo      - 2020-10718
 Djewel Yparraguirre       - 2020-11513
 
-PE 4 - Syntax Analysis
+FINAL PROJECT - Compiler for a Custom Programming Language
 
-This program implements a simple syntax
-analyzer with static semantic analysis
-for a custom programming language.
+This program implements a simple compiler for a
+custom programming language. It features a simple UI
+and a code editor with syntax highlighting. The program
+can perform lexical analysis, syntax analysis, and semantic
+analysis. It can also execute the code written in the custom
+programming language.
 
 Programming Language: JAVA
 */
@@ -216,7 +219,7 @@ class Bama_Marzo_Yparraguirre_FinalProj extends JFrame {
         mb.add(file);
         mb.add(compileCode);
         mb.add(showTokenizedCode);
-        mb.add(executeCode); // this line of code doesn't have any used in the current version of the program
+        mb.add(executeCode);
         executeCode.setEnabled(false);
 
         // Code Editor and Tokenized Code Area
@@ -390,6 +393,7 @@ class Bama_Marzo_Yparraguirre_FinalProj extends JFrame {
             }
         });
 
+        // Action listener for when the Execute Code menu item is clicked
         executeCode.addMenuListener(new MenuListener() {
             @Override
             public void menuSelected(MenuEvent e) {
@@ -411,6 +415,8 @@ class Bama_Marzo_Yparraguirre_FinalProj extends JFrame {
         addShortcutKey(showTokenizedCode, KeyEvent.VK_T, InputEvent.CTRL_DOWN_MASK);
         addShortcutKey(executeCode, KeyEvent.VK_E, InputEvent.CTRL_DOWN_MASK);
     }
+
+    // Method for adding shortcut keys to menu items
     private void addShortcutKey(JMenu menu, int keyCode, int modifiers) {
         KeyStroke keyStroke = KeyStroke.getKeyStroke(keyCode, modifiers);
 
@@ -434,6 +440,7 @@ class Bama_Marzo_Yparraguirre_FinalProj extends JFrame {
         getRootPane().getInputMap(JComponent.WHEN_IN_FOCUSED_WINDOW).put(keyStroke, menu.getText());
         getRootPane().getActionMap().put(menu.getText(), action);
     }
+
     // Method for opening file with a file chooser window
     private void openFileMethod(){
         
@@ -603,7 +610,6 @@ class Bama_Marzo_Yparraguirre_FinalProj extends JFrame {
         }
     }
     
-
     public List<Lexeme> lexemes = new ArrayList<>();
     public List<Lexeme> variables = new ArrayList<>();
 
@@ -622,6 +628,7 @@ class Bama_Marzo_Yparraguirre_FinalProj extends JFrame {
         return false;
     }
 
+    // Method to check if a given word is a command
     public boolean isCommand(String word) {
         String[] keywords = {"DEFINE", "INTO", "BEG", "PRINT", "NEWLN", "IOL", "LOI"};
     
@@ -632,6 +639,8 @@ class Bama_Marzo_Yparraguirre_FinalProj extends JFrame {
         }
         return false;
     }
+
+    // Method to check if a given word is an operator
     public boolean isOppr(String word) {
         String[] oppr = {"ADD","SUB","MULT","DIV","MOD"};
     
@@ -663,6 +672,7 @@ class Bama_Marzo_Yparraguirre_FinalProj extends JFrame {
 
     boolean lexicalSuccess = true;
     boolean syntaxAndSemanticSuccess = true;
+
     //Method for compiling code and performing lexical analysis
     private void compileCode() {
         successfulComp = true;
@@ -896,6 +906,7 @@ class Bama_Marzo_Yparraguirre_FinalProj extends JFrame {
         }
     }
 
+    // Variables and data structures for syntax and semantic analysis
     public List<intData> intVar = new ArrayList<>();
     public List<strData> strVar = new ArrayList<>();
     private intData intV;
@@ -1059,6 +1070,7 @@ class Bama_Marzo_Yparraguirre_FinalProj extends JFrame {
         if (errorExist) errorsPartII();
     }
 
+    // Method to empty the stack
     public void emptyStack() {
         while (!currentStatements.isEmpty()) {
             currentStatements.poll();
@@ -1078,6 +1090,7 @@ class Bama_Marzo_Yparraguirre_FinalProj extends JFrame {
         errorType = ""; //clear error type
     }
 
+    // Method to print errors found in the code
     void errorsPartII() {
         syntaxAndSemanticSuccess = false;
         successfulComp = false;
@@ -1089,13 +1102,12 @@ class Bama_Marzo_Yparraguirre_FinalProj extends JFrame {
     boolean into = false;
 
     // Method to check expressions at level 0
-
     public int checkExpr0 (int count0) {
         String errorType = "";
         activeOppr = false;
         pos = count0;
         Lexeme expr = lexemes.get(pos);
-        System.out.println("DIRI: " + expr.getToken());
+        //System.out.println("DIRI: " + expr.getToken());
         if (isIntLIT(expr.getLexeme())) {
             currentStatements.offer(expr.getLexeme()); 
             return pos+1;}
@@ -1109,7 +1121,7 @@ class Bama_Marzo_Yparraguirre_FinalProj extends JFrame {
             }
             else if (into && !((searchIntData(a) && searchIntData(b)) || (searchStrData(a) && searchStrData(b))))  {
                 currentStatements.offer(expr.getLexeme()); 
-                System.out.println(":)");
+                //System.out.println(":)");
                 errorType = "TYPE INCOMPABILITY";
                 printError(currentLine, errorType);
             }
@@ -1188,6 +1200,7 @@ class Bama_Marzo_Yparraguirre_FinalProj extends JFrame {
         return false;
     }
     
+    // Method to search for variables in data structures
     public int varDataCount (String var) {
         int dataCount = 0;
         for (intData data : intVar) {
@@ -1199,6 +1212,7 @@ class Bama_Marzo_Yparraguirre_FinalProj extends JFrame {
         return dataCount;
     }
 
+    // Method to search for integer variables in data structures
     public boolean searchIntData (String var) {
         for (intData data : intVar) {
             if (var.equals(data.getVarName())) return true;
@@ -1206,6 +1220,7 @@ class Bama_Marzo_Yparraguirre_FinalProj extends JFrame {
         return false;
     }
 
+    // Method to search for string variables in data structures
     public boolean searchStrData (String var) {
         for (strData data : strVar) {
             if (var.equals(data.getVarName())) return true;
@@ -1223,7 +1238,7 @@ class Bama_Marzo_Yparraguirre_FinalProj extends JFrame {
         }
     }
 
-
+    // Method to execute the program
     public void executeProgram() {
         console.append("\n\nIOL Execution\n");
         for (int i = 0; i < lexemes.size(); i++) {
@@ -1252,7 +1267,7 @@ class Bama_Marzo_Yparraguirre_FinalProj extends JFrame {
                 i+=2; //skipping IS
                 Object[] result = exprEval(i, lexemes.get(i).getLexeme());
                 i = (int)result[0]-1;
-                System.out.println("Current: " + i);
+                //System.out.println("Current: " + i);
                 variableSearchAndReplace(var, resultVar((String)result[1]));
             }
             else if(currentToken.equals("PRINT")) {
@@ -1261,7 +1276,7 @@ class Bama_Marzo_Yparraguirre_FinalProj extends JFrame {
                 if(var.equals("KEYWORD")) {
                     tok = lexemes.get(i).getToken();
                     if(tok.equals("ADD" )|| tok.equals("SUB") || tok.equals("MULT") || tok.equals("DIV") || tok.equals("MOD")){
-                  System.out.println("print");
+                  //System.out.println("print");
                         Object[] result = exprEval(i, lexemes.get(i).getLexeme());
                         console.append(resultVar((String)result[1]));
                     }
@@ -1307,26 +1322,26 @@ class Bama_Marzo_Yparraguirre_FinalProj extends JFrame {
         String opp = "";
         long results = 0;
         Lexeme expr1 = lexemes.get(posCount);
-        System.out.println(expr1);
+        //System.out.println(expr1);
         if (isIntLIT(expr1.getLexeme())) {
-            System.out.println("Ye");
+            //System.out.println("Ye");
             posCount++; 
             return Long.parseLong(expr1.getLexeme());
         }
         else if (isOppr(expr1.getToken())) {
-            System.out.println("Ya");
+            //System.out.println("Ya");
             opp = expr1.getToken();
             posCount++;
             firstExpr = exprEval1();
             secondExpr = exprEval1();
 
             results = eqSolve(opp, firstExpr, secondExpr);
-            System.out.println("Ngano ka? " + results);
+            //System.out.println("Ngano ka? " + results);
             exprRes = String.valueOf(results);
-            System.out.println("Ngano ka? " + results);
+            //System.out.println("Ngano ka? " + results);
             return results;
         }
-        System.out.println("Ngano ka? " + results);
+        //System.out.println("Ngano ka? " + results);
         return results;
     }
 
@@ -1334,7 +1349,7 @@ class Bama_Marzo_Yparraguirre_FinalProj extends JFrame {
     public long exprEval1() {
         Lexeme expr1 = lexemes.get(posCount);
         if (isIntLIT(expr1.getLexeme())) { // NAGCHANGE KO DIRI
-            System.out.println("Expr: " + expr1.getLexeme());
+           // System.out.println("Expr: " + expr1.getLexeme());
             posCount++;
             return Long.parseLong(expr1.getLexeme());
         } else if(expr1.getToken().equals("IDENT")){
@@ -1348,6 +1363,7 @@ class Bama_Marzo_Yparraguirre_FinalProj extends JFrame {
         return 0;
     }
 
+    // Method to process numeric expressions
     public long numExprEval2 () {
         String opp = "";
         long a, b;
@@ -1368,6 +1384,7 @@ class Bama_Marzo_Yparraguirre_FinalProj extends JFrame {
         return 0;
     }
 
+    // Method to solve equations
     public long eqSolve(String opp, long a, long b) {
         long results = 0;
     
@@ -1402,12 +1419,14 @@ class Bama_Marzo_Yparraguirre_FinalProj extends JFrame {
         } catch (ArithmeticException e) {
             console.append("Arithmetic Exception: " + e.getMessage());
         }
-        System.out.println("Results: >>>>>>> " + results);
+        //System.out.println("Results: >>>>>>> " + results);
         return results;
     }
     
 
     boolean typeError = false;
+
+    // Method to search for variables in data structures
     public void variableSearchAndReplace(String var, String userInput){
         for (intData data : intVar) {
             if (!isValidInteger(userInput)) break;
